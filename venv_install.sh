@@ -20,4 +20,4 @@ deactivate
 # pip3 freeze > requirements.txt
 
 
-# pip3 install -v uiautomator2==2.7.3 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+# pip3 install -v logzero==1.5.0 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com

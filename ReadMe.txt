@@ -14,13 +14,11 @@
 
 
 【 未 解 决 的 问 题 】
-偶尔的问题：小米5S 若长时间未亮屏，第一次执行时，会有问题
-暂时的方案：设置默认等待时间30秒
+
 
 
 【 关于 本地 gulp 部 署 后 的 注 意 事 项 】
-1.第一次 adb 连接 Android 设备 需要在设备上授权
-2.第一次 安装 ATXserver 服务到设备 需要在设备上授权
+
 
 
 ########################################################################################################################
@@ -90,19 +88,78 @@ sudo nginx -s reload
 ########################################################################################################################
 
 
-【 配 置 Openatx uiautomator2 Android 环 境 】
+【 配 置 Openatx/Facebook-wda iOS 环 境 】
 
-1.安装工具
-（1）安装 android-sdk 工具（提供adb命令连接真机或模拟器、提供uiautomatorviewer 定位元素）
-（2）安装 uiautomator2 工具：pip3 install -U uiautomator2（提供openatx服务）
+【 安 装 工 具 】
+1.安装 libimobiledevice：使用本机与苹果iOS设备的服务进行通信的库
+         https://www.jianshu.com/p/cff879e5ca65
+2.安装 carthage：iOS第三方库管理工具，项目依赖管理，WebDriverAgent用它做项目依赖
+3.安装 ideviceinstaller（iOS 版本9及以下）：不依赖于XCODE,进行安装和调试IOS应用程序
+  安装 iOS-deploy（iOS 版本10及以上）: 不依赖于XCODE,进行安装和调试IOS应用程序
+4.安装 appium-doctor：检查 appium 项目配置环境（ 检查命令 appium-doctor --ios ）
+5.安装 node & npm
+6.安装 Xcode
+7.安装 iproxy：将设备上的端口映射到电脑上的某个端口（ brew install usbmuxd ）
+8.安装 WebDriverAgent：在模拟器或真机中运行的用于iOS的WebDriver服务器
+    （ 通过命令将 WebDriverAgent 应用安装在设备上并启动WDA监听服务，使设备与电脑保持通信 ）
 
-2.连接设备
-（1）adb连真机：adb connect 192.168.31.136:5555 < 小米5S >
-              adb connect 192.168.31.253:4444 < 坚果Pro >
+【 开 启 服 务 】
+1.在设备中启动 WebDriverAgent 服务
+ 终端命令（真机）  ：xcodebuild -project ../WebDriverAgent.xcodeproj  -scheme WebDriverAgentRunner  -destination "id=$UDID"  test
+ 终端命令（模拟器）：xcodebuild -project ../WebDriverAgent.xcodeproj  -scheme WebDriverAgentRunner  -destination "platform=iOS Simulator,name=iPhone 8"  test
+  < 备 注 >
+ （1）原理：通过命令将 WebDriverAgent 应用安装在设备上并启动WDA监听服务，使设备与电脑保持通信
+ （2）真机必须与电脑通过 USB 一直连接着
+ （3）第一次需要使用Xcode进行配置调试，确认是否能正常启动
 
-（2）安装ATXserver服务到设备：python3 -m uiautomator2 init
-    （ 在设备上安装的用于保持设备与电脑通信的服务 ）
-    （ 注：第一次需要在真机上进行授权，可同时安装多个已连接的设备 ）
+2.端口映射（将手机的端口映射到MAC上）
+ 终端命令：iproxy 8100 8100
+ 验证地址：http://localhost:8100/status
+  < 备 注 >
+ （1）仅针对使用真机的情况
+ （2）有些国产的iPhone机器通过手机的IP和端口还不能访问，此时需要将手机的端口转发到Mac上
+
+
+【 启 动 多 个 WDA 服 务 的 方 法 】
+1.创建两个 WebDriverAgent 项目
+（1）../WDA_iOS/8100/WebDriverAgent/WebDriverAgent.xcodeproj
+（2）../WDA_iOS/8200/WebDriverAgent/WebDriverAgent.xcodeproj
+2.通过Xcode进行配置调试成功
+3.进入第二个项目，将8100端口改成8200，然后保存（ 搜索"8100"，可找到两处）
+4.通过 xcodebuild 命令，分别启动两个项目，各自对应的端口为：8100、8200
+
+
+-----------------------------------------------
+
+
+【 终端启动 WebDriverAgent 服务命令 】
+
+举 例：
+< iPhone 8 模 拟 器 （ WDA 8100 端 口 ）>
+xcodebuild test -project /Users/micllo/Documents/works/GitHub/WDA_iOS/8100/WebDriverAgent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination "platform=iOS Simulator,name=iPhone 8"
+
+< iPhone 11 模 拟 器 （ WDA 8200 端 口 ）>
+xcodebuild test -project /Users/micllo/Documents/works/GitHub/WDA_iOS/8200/WebDriverAgent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination "platform=iOS Simulator,name=iPhone 11"
+
+< iPhone 7 真 机 （ WDA 8200 端 口 ）>
+xcodebuild test -project /Users/micllo/Documents/works/GitHub/WDA_iOS/8200/WebDriverAgent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb"
+
+# 打开模拟器应用（ 若模拟器未打开的情况 ）
+open "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app/"
+
+# 查看模拟器可用列表
+xcrun simctl list
+xcrun simctl list devices
+
+# 查看启动设备进程
+ps -ef | grep -v "grep" | grep xcodebuild
+ps -ef | grep -v "grep" | grep xcodebuild | awk '{print $2}' | xargs kill -9
+
+
+# 真机 端口映射
+iproxy 8100 8100
+ps -ef | grep -v "grep" | grep iproxy
+ps -ef | grep -v "grep" | grep iproxy | awk '{print $2}' | xargs kill -9
 
 
 ########################################################################################################################
@@ -147,32 +204,11 @@ sudo nginx -s reload
 pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 
-------------------------------------------
-
-【 真 机 连 接 方 式 】
-
-1.无线连接真机(使用一次USB)：
-（1）通过USB将真机连接电脑
-（2）让真机在5555端口监听TCP/IP连接：adb -s 设备ID tcpip 5555
-（3）找到真机的ip地址：设置 -> 关于本机 -> 本机状态信息 -> IP地址
-（4）通过ip地址连接真机：adb connect 192.168.31.56:5555
-    （ 断开连接设备：adb disconnect 192.168.31.56:5555 ）
-
-2.无线连接真机(无需USB)：
-  前提：先将真机刷机获取root权限（ 通过win上使用'奇兔刷机'软件）
-       在真机上安装超级终端模拟器（ Terminal_Emulator.apk ）：adb install Terminal_Emulator.apk
-（1）使用真机在终端模拟器上输入下面两行
-     su
-     setprop service.adb.tcp.port 5555
-     备注：有些设备（小米 5S）可能需要重启adbd服务：restart adbd（ 若无效 则：先 stop adbd  再 start adbd ）
-（2）找到 设备的ip地址：设置 -> 关于本机 -> 本机状态信息 -> IP地址
-（3）通过ip地址连接设备：adb connect 192.168.31.136:5555
-
 
 ########################################################################################################################
 
 
-【 服 务 端 配 置 Openatx uiautomator2 Android 环 境 】
+【 服 务 端 配 置 Openatx/Facebook-wda 环 境 】
 
 [ 未 解 决 的 问 题 ]
 'Docker'中无法获取通过'USB'连接的真机设备
@@ -243,9 +279,6 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
      （3）在服务器中进行部署操作：停止nginx、mongo、uwsgi服务 -> 替换项目、uwsgi.ini配置文件 -> 替换config配置文件 -> 启动nginx、mongo、uwsgi服务
      （4）删除本地的临时文件夹
       命令：gulp "deploy docker" -> 编译后 部署docker服务
-    2.手动检测并确认
-     （1）检查：Android 设备在Docker中是否正确连接 ： docker exec -it android_openatx_auto_test adb devices
-     （2）若 第一次 安装 ATXserver 服务到设备，则需要在设备上进行授权操作
 
 
 ########################################################################################################################

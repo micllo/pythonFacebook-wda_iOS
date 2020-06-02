@@ -4,7 +4,8 @@ import time
 wda.DEBUG = False  # 显示每个与WDA服务的HTTP请求的信息
 wda.HTTP_TIMEOUT = 60.0  # 设置与WDA服务的HTTP请求超时时间
 
-c = wda.Client('http://localhost:8100')  # 设备连接
+# c = wda.Client('http://localhost:8100')  # 设备连接
+c = wda.Client('http://localhost:8200')  # 设备连接
 print(c.status())
 print()
 
@@ -59,8 +60,8 @@ with c.session('com.apple.Health') as s:
     # search_input = s(label="Search")
     search_input = s(name="Search")
     print("search_input.name : " + str(search_input.name))
-    print("search_input.bounds.x : " + str(search_input.bounds.x))
-    print("search_input.bounds.y : " + str(search_input.bounds.y))
+    # print("search_input.bounds.x : " + str(search_input.bounds.x))
+    # print("search_input.bounds.y : " + str(search_input.bounds.y))
     print("search_input.bounds.width : " + str(search_input.bounds.width))
     print("search_input.bounds.height : " + str(search_input.bounds.height))
     search_input.click_exists(timeout=3.0)
@@ -78,12 +79,13 @@ with c.session('com.apple.Health') as s:
     time.sleep(2)
 
     # 6.点击"Heart Rate"进入
-    s(xpath='(//XCUIElementTypeOther[@name="feeditem_identifier"])[1]/XCUIElementTypeButton').click()
+    s(nameContains="BPM").click()
     time.sleep(2)
 
     # 7.点击"Add Data"
     # s.tap(360, 70)
-    s(xpath='//XCUIElementTypeButton[@name="Add Data"]').click()
+    # s(xpath='//XCUIElementTypeButton[@name="Add Data"]').click()
+    s(xpath='//NavigationBar/Button[2]').click()
     # s(name="Add Data").click()
     time.sleep(2)
 
