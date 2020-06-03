@@ -6,7 +6,7 @@ from Config.error_mapping import *
 from Api.api_services.api_template import interface_template
 from Api.api_services.api_calculate import *
 from Common.com_func import is_null
-from Common.test_func import is_exist_start_case, is_exist_online_case, get_connected_android_devices_info
+from Common.test_func import is_exist_start_case, is_exist_online_case, get_connected_ios_devices_info
 from Tools.mongodb import MongoGridFS
 from Env import env_config as cfg
 from Config.pro_config import pro_exist
@@ -44,7 +44,7 @@ def run_case(pro_name):
     """
     同时执行不同的用例 (开启线程执行，直接返回接口结果)
     [ 备 注 ]
-        需要判断Android设备连接情况，若都未连接，表示不开启线程进行测试，并给出报错结果
+        需要判断iOS设备连接情况，若都未连接，表示不开启线程进行测试，并给出报错结果
     :param pro_name:
     :return:
     """
@@ -52,9 +52,9 @@ def run_case(pro_name):
         msg = PRO_NOT_EXIST
     else:
         # 获取已连接的设备列表
-        connected_android_device_list = get_connected_android_devices_info(pro_name)
-        if is_null(connected_android_device_list):
-            msg = ANDROID_DEVICES_NOT_CONNECT
+        connected_ios_device_list = get_connected_ios_devices_info(pro_name)
+        if is_null(connected_ios_device_list):
+            msg = iOS_DEVICES_NOT_CONNECT
         else:
             run_flag = is_exist_start_case(pro_name)
             if run_flag == "mongo error":
@@ -63,7 +63,7 @@ def run_case(pro_name):
                 if run_flag:
                     msg = EXIST_RUNNING_CASE
                 elif is_exist_online_case(pro_name):
-                    sync_run_case(pro_name, connected_android_device_list)
+                    sync_run_case(pro_name, connected_ios_device_list)
                     msg = CASE_RUNING
                 else:
                     msg = NO_ONLINE_CASE

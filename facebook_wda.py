@@ -56,9 +56,9 @@ with c.session('com.apple.Health') as s:
     time.sleep(2)
 
     # 3.输入框搜索 Heart
-    # search_input = s(xpath='//XCUIElementTypeSearchField[@name="Search"]')
+    search_input = s(xpath='//XCUIElementTypeSearchField[@name="Search12345"]')
     # search_input = s(label="Search")
-    search_input = s(name="Search")
+    # search_input = s(name="Search")
     print("search_input.name : " + str(search_input.name))
     # print("search_input.bounds.x : " + str(search_input.bounds.x))
     # print("search_input.bounds.y : " + str(search_input.bounds.y))

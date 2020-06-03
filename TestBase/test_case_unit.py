@@ -4,27 +4,27 @@ from Common.com_func import log
 from Tools.mongodb import MongodbUtils
 from Env import env_config as cfg
 from Common.test_func import mongo_exception_send_DD
-from TestBase.app_action import get_android_driver
+from TestBase.app_action import get_ios_client
 from Common.test_func import send_DD_for_FXC
 
 
 class ParaCase(unittest.TestCase):
 
-    def __init__(self, pro_name, test_method="test_", connected_android_device_list=[]):
+    def __init__(self, pro_name, test_method="test_", connected_ios_device_list=[]):
         """
         【 用 例 对 象 初 始 化 】
         :param pro_name :
         :param test_method : 这个参数必须是测试类中存在的以'test_'开头的方法
-        :param connected_android_device_list : 已连接设备信息列表
+        :param connected_ios_device_list : 已连接设备信息列表
         """
         super(ParaCase, self).__init__(test_method)
         self.log = log
         self.pro_name = pro_name
         self.test_method = test_method
-        self.connected_android_device_list = connected_android_device_list
+        self.connected_ios_device_list = connected_ios_device_list
         # 截图ID列表
         self.screen_shot_id_list = []
-        # 获取当前的'类名.方法名' (作用：每个用例的截图ID列表名称、每个用例使用的Android设备名称)
+        # 获取当前的'类名.方法名' (作用：每个用例的截图ID列表名称、每个用例使用的iOS设备名称)
         self.class_method_name = self.__class__.__name__ + "." + test_method
         # 获取当前的'类名/方法名/'(作用：提供截屏路径)
         self.class_method_path = self.__class__.__name__ + "/" + test_method + "/"
@@ -36,7 +36,7 @@ class ParaCase(unittest.TestCase):
         【 每个用例对象执行前，需要进行如下配置 】
 
         【 备 注 】
-            self.driver  : 操作 Android 设备
+            self.client  : 操作 iOS 设备
             self.session : 操作 APP 应用
         :return:
         """
@@ -44,30 +44,33 @@ class ParaCase(unittest.TestCase):
         # 通过线程名的索引 获取登录账号
         self.user, self.passwd = get_login_accout(self.current_thread_name_index)
 
-        # 获取'Android'驱动、设备名称
-        self.driver, self.device_name = get_android_driver(self.pro_name, self.current_thread_name_index,
-                                                           self.connected_android_device_list)
+        # 获取'iOS'驱动、设备名称
+        self.client, self.device_name = get_ios_client(self.pro_name, self.current_thread_name_index,
+                                                           self.connected_ios_device_list)
         # 获取APP应用信息
-        from Config.pro_config import get_app_package
-        self.app_package = get_app_package(self.pro_name)
+        from Config.pro_config import get_app_bundleId
+        self.app_bundleId = get_app_bundleId(self.pro_name)
 
-        # 通过'Android'驱动 启动APP应用
+        # 通过'iOS'驱动 启动APP应用
         try:
-            self.session = self.driver.session(self.app_package)
+            self.session = self.client.session(self.app_bundleId)
         except Exception as e:
             log.error(("显示异常：" + str(e)))
             if "SessionBrokenError" in str(e):
                 error_msg = self.pro_name + " 项目的APP应用没有启动"
-            elif "package not found" in str(e):
-                error_msg = self.pro_name + " 项目的APP应用package名称有误"
+            elif "Read timed out" in str(e):
+                error_msg = self.pro_name + " Session会话超时，可能是应用的bundleId设置有误"
             else:
                 error_msg = self.pro_name + " 项目启动APP时 出现异常情况"
             send_DD_for_FXC(title=self.pro_name, text="#### " + error_msg + "")
             raise Exception(error_msg)
 
-        # 获取当前APP的信息 {'package': '', 'activity': ''}
-        # self.log.info(self.driver.app_current())
-        # self.log.info(self.session.app_current())
+        # 获取当前APP的信息{"pid": 1281, "bundleId": ""}
+        self.log.info("当前APP信息：" + str(self.client.app_current()))
+
+        # 当前的 bundleId 和 sessinId (会话id)
+        self.log.info("当前 bundleId：" + str(self.session.bundle_id))
+        self.log.info("当前 sessinId：" + str(self.session.id))
 
     def tearDown(self):
         """
@@ -77,15 +80,15 @@ class ParaCase(unittest.TestCase):
         # 停止APP应用
         self.session.close()
 
-        # 通过'Android'驱动 关闭APP应用
-        # self.driver.app_stop(self.app_package)
+        # 通过'iOS'驱动 终止APP应用
+        # self.session.app_terminate(self.app_bundleId)
 
     @staticmethod
-    def get_online_case_to_suite(pro_name, connected_android_device_list=[]):
+    def get_online_case_to_suite(pro_name, connected_ios_device_list=[]):
         """
         将'测试类'列表中的'上线'的'测试方法'添加入 suite 实例对象中
         :param pro_name:
-        :param connected_android_device_list: 已连接设备信息列表
+        :param connected_ios_device_list: 已连接设备信息列表
         :return:
         【 添 加 步 骤 】
         1.从mongo中获取'上线'状态的'测试用例'列表
@@ -120,7 +123,7 @@ class ParaCase(unittest.TestCase):
             for test_method_name in test_methods_name:
                 if test_method_name in on_line_test_method_name_list:  # 匹配'测试方法'名称
                     test_instance = test_class(pro_name=pro_name, test_method=test_method_name,
-                                               connected_android_device_list=connected_android_device_list)
+                                               connected_ios_device_list=connected_ios_device_list)
                     suite.addTest(test_instance)
         return suite, on_line_test_method_name_list
 

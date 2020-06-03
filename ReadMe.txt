@@ -6,19 +6,18 @@
 3.在'page_object'目录下提供：元素定位、页面操作方法
 4.在'case_test'目录下提供：测试用例
 5.在'Config > pro_config.py'文件中进行项目配置：
-（1）get_test_class_list：         通过'项目名'获取'测试类'列表
-（2）pro_exist：                   判断项目名称是否存在
-（3）get_login_accout：            通过'线程名的索引' 获取登录账号
-（4）get_app_info：                通过项目名称 获取APP信息 （ appPackage ）
-（5）config_android_device_list：  配置 Android 设备信息列表
-
+（1）get_test_class_list        通过'项目名'获取'测试类'列表
+（2）pro_exist                  判断项目名称是否存在
+（3）get_login_accout           通过'线程名的索引' 获取登录账号
+（4）get_app_info               通过项目名称 获取APP信息 （ appPackage ）
+（5）config_ios_device_list     配置'iOS'设备信息列表
 
 【 未 解 决 的 问 题 】
 
 
 
-【 关于 本地 gulp 部 署 后 的 注 意 事 项 】
-
+【 关于 本地 gulp 部 署 前 的 注 意 事 项 】
+在通过'xcodebuile'命令启动WDA服务前，需要先通过'XCode'工具手动启动'WebDriverAgent'项目，并确认是否能正常启动
 
 
 ########################################################################################################################
@@ -28,7 +27,8 @@
 
 1.配置本地 venv 虚拟环境
 （1）修改：requirements_init.txt
-（2）执行：sh -x venv_install.sh
+（2）删除：原有 venv 目录
+（3）执行：sh -x venv_install.sh
 
 2.配置 gulpfile 依赖
 （1）修改：gulpfile_install.sh
@@ -104,7 +104,7 @@ sudo nginx -s reload
     （ 通过命令将 WebDriverAgent 应用安装在设备上并启动WDA监听服务，使设备与电脑保持通信 ）
 
 【 开 启 服 务 】
-1.在设备中启动 WebDriverAgent 服务
+1.在设备中启动'WebDriverAgent'服务，开启监听端口（默认8100）
  终端命令（真机）  ：xcodebuild -project ../WebDriverAgent.xcodeproj  -scheme WebDriverAgentRunner  -destination "id=$UDID"  test
  终端命令（模拟器）：xcodebuild -project ../WebDriverAgent.xcodeproj  -scheme WebDriverAgentRunner  -destination "platform=iOS Simulator,name=iPhone 8"  test
   < 备 注 >
@@ -152,12 +152,11 @@ xcrun simctl list
 xcrun simctl list devices
 
 # 查看启动设备进程
-ps -ef | grep -v "grep" | grep xcodebuild
-ps -ef | grep -v "grep" | grep xcodebuild | awk '{print $2}' | xargs kill -9
-
+ps -ef | grep -v "grep" | grep WebDriverAgentRunner
+ps -ef | grep -v "grep" | grep WebDriverAgentRunner | awk '{print $2}' | xargs kill -9
 
 # 真机 端口映射
-iproxy 8100 8100
+iproxy 8200 8200
 ps -ef | grep -v "grep" | grep iproxy
 ps -ef | grep -v "grep" | grep iproxy | awk '{print $2}' | xargs kill -9
 
@@ -213,16 +212,12 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 [ 未 解 决 的 问 题 ]
 'Docker'中无法获取通过'USB'连接的真机设备
 
-[ 前 提 条 件 ]
-1.生产环境为了减少意外情况，尽量使用无线连接真机
-2.刷机成功的真机 可以直接在手机的超级终端上开启监听端口（ 直接无线连接 ）
-3.不能刷机的真机 可以使用USB通过电脑为该手机开启监听端口 （ 使用一次USB后，可以无线连接 ）
-（ 注：服务器 与 设备 要处于同一网络下 ）
-
 [ 环 境 配 置 方 案 ]
-1.在 linux | win10 | mac_mini 上启用一个Docker容器
-2.Docker容器包含的工具或服务：Android-SDK工具、uiautomator2工具、监控服务
- ( 注：若 使用 linux 则要确保 linux 与 手机 处于同一网络 )
+1.在 mac_mini 上启用一个Docker容器：监控服务
+2.在 mac_mini 主机上安装相应工具和服务，并配置iOS设备的连接
+（1）若使用真机，则需要USB连接电脑
+（2）使用'xcodebuild'命令将WDA服务安装入真机或模拟器中并启动端口
+（3）有些真机无法通过IP和端口访问，需要通过'iproxy'命令将设备的端口映射到电脑上
 
 
 ------------------------------------------
@@ -285,7 +280,7 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 
 
 【 框 架 工 具 】
- Python3 + uiautomator2 + unittest + Flask + uWSGI + Nginx + Bootstrap + MongoDB + Docker + Fabric + Gulp
+ Python3 + Openatx/Facebook-wda + unittest + Flask + uWSGI + Nginx + Bootstrap + MongoDB + Docker + Fabric + Gulp
 
 
 【 框 架 结 构 】（ 提高代码的：可读性、重用性、易扩展性 ）
@@ -306,7 +301,7 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 
 【 功 能 点 】
 
-1.使用 Python3 + uiautomator2 + unittest + Bootstrap:
+1.使用 Python3 + Openatx/Facebook-wda + unittest + Bootstrap:
 （1）使用'unittest'作为测试用例框架
 （2）通过动态修改和添加'unittest.TestSuite'类中的方法和属性，实现启用多线程同时执行多条测试用例
 （3）通过修改'HTMLTestRunner'文件并结合'unittest'测试框架，优化了测试报告的展示方式，并提供了每个测试用例的截图显示
@@ -314,7 +309,7 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 （5）提供日志记录功能：按照日期区分
 （6）提供定时任务：定时删除过期(一周前)的文件：日志、报告、截图文件(mongo数据)，定时执行测试用例
 （7）提供页面展示项目用例，实现用例上下线、批量执行用例、显示报告、用例运行进度等功能
-（8）多线程并发处理方式：先通过adb命令查看Android设备连接情况(已连接|未连接|未授权)、再将'已连接'的设备列表数量 作为 并发线程数量
+（8）多线程并发处理方式：????
 
 2.使用 Flask ：
 （1）提供 执行用例的接口
@@ -343,4 +338,4 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 （2）编译静态文件，防止浏览器缓存js问题
 （3）实时监听本地调试页面功能
 
-9.使用的工具和服务：Android-SDK 工具、uiautomator2 工具 ( ATX 服务 )
+9.使用的工具和服务：XCode 工具、WebDriverAgent 服务 ( WDA 服务 )

@@ -6,7 +6,7 @@ from Api.api_services.api_interface import *
 
 @flask_app.route("/")
 def server_index():
-    server_info = "pythonFacebook-wda_iOS：V1.0.00R20200531"
+    server_info = "pythonFacebook-wda_iOS：V1.0.00R20200601"
     return server_info
 
 

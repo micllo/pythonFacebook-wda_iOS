@@ -32,7 +32,7 @@ def generate_report(pro_name, suite, title, description, tester, verbosity=1):
     print("+++++++++++++++++++++++++++++++++++")
 
     now = time.strftime("%Y-%m-%d_%H_%M_%S", time.localtime(time.time()))
-    current_report_name = "[Android_report]" + pro_name + "[" + now + "].html"
+    current_report_name = "[iOS_report]" + pro_name + "[" + now + "].html"
     pro_report_path = cfg.REPORTS_DIR + pro_name + "/"
     history_report_path = pro_report_path + "history/"
     mkdir(history_report_path)
@@ -41,9 +41,9 @@ def generate_report(pro_name, suite, title, description, tester, verbosity=1):
         runner = HTMLTestRunner(stream=fp, title=title, description=description, tester=tester, verbosity=verbosity)
         test_result = runner.run(suite)
 
-    # 将最新报告替换../Reports/{{pro_name}}/下的[Android_report]{{pro_name}}.html
+    # 将最新报告替换../Reports/{{pro_name}}/下的[iOS_report]{{pro_name}}.html
     res = os.system("cp " + current_report_file + " " + pro_report_path + " && "
-                    "mv " + pro_report_path + current_report_name + " " + pro_report_path + "[Android_report]" + pro_name + ".html")
+                    "mv " + pro_report_path + current_report_name + " " + pro_report_path + "[iOS_report]" + pro_name + ".html")
     if res != 0:
         log.error("测试报告替换操作有误！")
 
@@ -60,9 +60,10 @@ def generate_report(pro_name, suite, title, description, tester, verbosity=1):
     return test_result, current_report_file
 
 
-def send_warning_after_test(test_result, report_file):
+def send_warning_after_test(pro_name, test_result, report_file):
     """
        测 试 后 发 送 预 警 （ 邮件、钉钉 ）
+       :param pro_name:
        :param test_result:
        :param report_file:
        :return:
@@ -74,33 +75,35 @@ def send_warning_after_test(test_result, report_file):
     report_name = report_file.split("/")[-1]
     error_type = (test_result.failure_count > 0 and "失败" or (test_result.error_count > 0 and "错误" or None))
     if error_type:
-        send_mail_after_test(error_type=error_type, report_name=report_name, report_file=report_file)
-        send_DD_after_test(error_type=error_type, report_name=report_name, is_at_all=(error_type == "失败" and True or False))
+        send_mail_after_test(error_type=error_type, report_name=report_name, report_file=report_file, pro_name=pro_name)
+        send_DD_after_test(error_type=error_type, report_name=report_name, pro_name=pro_name, is_at_all=(error_type == "失败" and True or False))
 
 
-def send_mail_after_test(error_type, report_name, report_file):
+def send_mail_after_test(error_type, report_name, report_file, pro_name):
     """
     测 试 后 发 送 邮 件
     :param error_type: "失败"、"错误"
     :param report_name:
     :param report_file:
+    :param pro_name:
     :return:
     """
-    subject = "Android自动化测试'" + report_name.split(".")[-2] + "'存在'" + error_type + "'的用例"
-    content = "在'" + report_name + "'测试报告中 存在'" + error_type + "'的用例\n测试报告地址： " + cfg.CURRENT_REPORT_URL
+    subject = "iOS自动化测试'" + report_name.split(".")[-2] + "'存在'" + error_type + "'的用例"
+    content = "在'" + report_name + "'测试报告中 存在'" + error_type + "'的用例\n测试报告地址： " + cfg.BASE_REPORT_PATH + pro_name + "/history/" + report_name
     send_mail(subject=subject, content=content, to_list=cfg.MAIL_LIST, attach_file=report_file)
 
 
-def send_DD_after_test(error_type, report_name, is_at_all=False):
+def send_DD_after_test(error_type, report_name, pro_name, is_at_all=False):
     """
     测 试 后 发 送 钉 钉
     :param error_type: "失败"、"错误"
     :param report_name:
+    :param pro_name:
     :param is_at_all:
     :return:
 
     """
-    text = "#### 在'" + report_name + "'测试报告中 存在'" + error_type + "'的用例\n\n ***测试报告地址***\n" + cfg.CURRENT_REPORT_URL
+    text = "#### 在'" + report_name + "'测试报告中 存在'" + error_type + "'的用例\n\n ***测试报告地址***\n" + cfg.BASE_REPORT_PATH + pro_name + "/history/" + report_name
     send_DD(dd_group_id=cfg.DD_MONITOR_GROUP, title=report_name, text=text, at_phones=cfg.DD_AT_PHONES, is_at_all=is_at_all)
 
 
@@ -123,7 +126,7 @@ def mongo_exception_send_DD(e, msg):
     :return:
     """
     title = "'mongo'操作通知"
-    text = "#### Android自动化测试'mongo'操作错误\n\n****操作方式：" + msg + "****\n\n****错误原因：" + str(e) + "****"
+    text = "#### iOS自动化测试'mongo'操作错误\n\n****操作方式：" + msg + "****\n\n****错误原因：" + str(e) + "****"
     send_DD(dd_group_id=cfg.DD_MONITOR_GROUP, title=title, text=text, at_phones=cfg.DD_AT_FXC, is_at_all=False)
 
 
@@ -207,43 +210,41 @@ def stop_case_run_status(pro_name, test_method_name):
             return "mongo error"
 
 
-def get_connected_android_devices_info(pro_name):
+def get_connected_ios_devices_info(pro_name):
     """
-    【 获取 已连接的 Android 设备信息列表 】
-     1.获取 配置的 Android 设备信息列表
-     2.通过 adb 命令 查看 Android 设备 连接情况
-     （1）192.168.31.136:5555 device       （ 已连接 ）
-     （2）192.168.31.253:4444 offline      （ 未连接 ）
-     （3）192.168.31.136:5555 unauthorized （ 未授权 ）
+    【 获取 已连接的 iOS 设备信息列表 】
+     1.获取 配置的 iOS 设备信息列表
+     2.通过 ps aux 命令 查看 WDA服务连接的iOS设备情况
+     （1）-destination "platform=iOS Simulator,name=iPhone 8"
+     （2）-destination "platform=iOS Simulator,name=iPhone 11"
+     （3）-destination "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb"
      3.将'已连接'的设备修改其对应的'thread_index'，并保存入列表
-     4.将'未连接、未授权'的设备，发送钉钉通知
+     4.将'未连接'的设备，发送钉钉通知
 
      :return: 已连接设备信息列表
 
     【 备注 】若 SSH 登录失败，则返回 空列表
     """
-    # 获取 配置的 Android 设备信息列表
-    from Config.pro_config import config_android_device_list
-    android_device_list = config_android_device_list()
+    # 获取 配置的 iOS 设备信息列表
+    from Config.pro_config import config_ios_device_list
+    ios_device_list = config_ios_device_list()
     device_num = 0
-    connected_android_device_list = []
+    connected_ios_device_list = []
 
-    # 通过 adb 命令 查看 Android 设备 连接情况
-    cmd_res = subprocess.check_output(["adb", "devices"])
+    # 通过 ps aux 命令 查看 WDA服务连接的iOS设备情况
+    cmd_res = subprocess.check_output(["ps", "aux", "|", "grep", "-v", "\"grep\"", "|", "grep", "WebDriverAgentRunner"], shell=True)
     print(cmd_res)
     print(type(cmd_res))
-    # 若 Android 设备 UDID 出现在查询结果中则保存入列表
-    for android_device_dict in android_device_list:
-        if android_device_dict["device_udid"] + "\\tdevice" in str(cmd_res):
+    # 若 iOS 设备对应的 destination 出现在查询结果中则保存入列表
+    for ios_device_dict in ios_device_list:
+        if "-destination " + ios_device_dict["wda_destination"] in str(cmd_res):
             device_num += 1
-            connected_android_device_dict = android_device_dict
-            connected_android_device_dict["thread_index"] = device_num
-            connected_android_device_list.append(connected_android_device_dict)
-        if android_device_dict["device_udid"] + "\\toffline" in str(cmd_res):
-            send_DD_for_FXC(title=pro_name, text="#### " + pro_name + " 项目 " + android_device_dict["device_name"] + " 设 备 未 连 接 ")
-        if android_device_dict["device_udid"] + "\\tunauthorized" in str(cmd_res):
-            send_DD_for_FXC(title=pro_name, text="#### " + pro_name + " 项目 " + android_device_dict["device_name"] + " 设 备 未 授 权 ")
-    return connected_android_device_list
+            connected_ios_device_dict = ios_device_dict
+            connected_ios_device_dict["thread_index"] = device_num
+            connected_ios_device_list.append(connected_ios_device_dict)
+        else:
+            send_DD_for_FXC(title=pro_name, text="#### " + pro_name + " 项目 " + ios_device_dict["device_name"] + " 设 备 未 连 接 WDA 服 务")
+    return connected_ios_device_list
 
 
 if __name__ == "__main__":
@@ -253,6 +254,6 @@ if __name__ == "__main__":
     # print(is_exist_online_case(pro_name="pro_demo_1"))
     # stop_case_run_status("pro_demo_1", "test_demo_01")
 
-    print(get_connected_android_devices_info("pro_demo_1"))
+    print(get_connected_ios_devices_info("pro_demo_1"))
 
 
