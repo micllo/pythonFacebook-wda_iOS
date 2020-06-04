@@ -4,8 +4,8 @@ import time
 wda.DEBUG = False  # 显示每个与WDA服务的HTTP请求的信息
 wda.HTTP_TIMEOUT = 60.0  # 设置与WDA服务的HTTP请求超时时间
 
-# c = wda.Client('http://localhost:8100')  # 设备连接
-c = wda.Client('http://localhost:8200')  # 设备连接
+c = wda.Client('http://localhost:8100')  # 设备连接
+# c = wda.Client('http://localhost:8200')  # 设备连接
 print(c.status())
 print()
 
@@ -13,7 +13,7 @@ print()
 c.wait_ready(timeout=300)  # 等待300s，默认120s
 
 # 全局默认的元素定位超时时间5秒
-c.implicitly_wait(5.0)
+c.implicitly_wait(15.0)
 
 """
     测 试 步 骤
@@ -32,7 +32,7 @@ c.implicitly_wait(5.0)
 with c.session('com.apple.Health') as s:
 
     # 设置默认的元素定位超时时间5秒
-    # s.implicitly_wait(5.0)
+    s.implicitly_wait(5.0)
 
     # 当前的 bundleId 和 sessinId (会话id)
     print(s.bundle_id, s.id)
@@ -56,12 +56,12 @@ with c.session('com.apple.Health') as s:
     time.sleep(2)
 
     # 3.输入框搜索 Heart
-    search_input = s(xpath='//XCUIElementTypeSearchField[@name="Search12345"]')
+    # search_input = s(xpath='//XCUIElementTypeSearchField[@name="Search"]')
     # search_input = s(label="Search")
-    # search_input = s(name="Search")
+    search_input = s(name="Search123456")
     print("search_input.name : " + str(search_input.name))
-    # print("search_input.bounds.x : " + str(search_input.bounds.x))
-    # print("search_input.bounds.y : " + str(search_input.bounds.y))
+    print("search_input.bounds.x : " + str(search_input.bounds.x))
+    print("search_input.bounds.y : " + str(search_input.bounds.y))
     print("search_input.bounds.width : " + str(search_input.bounds.width))
     print("search_input.bounds.height : " + str(search_input.bounds.height))
     search_input.click_exists(timeout=3.0)
@@ -71,7 +71,7 @@ with c.session('com.apple.Health') as s:
 
     # 4.等待"Nutrition"内容消失
     s(text='Nutrition').wait_gone(timeout=3.0)
-    print("内容 Nutrition 是否存在: " + str(s(text="Nutrition").exists))
+    print("内容 Nutrition 是否存在: " + str(s(text="Nutrition").exists()))
     time.sleep(2)
 
     # 5.判断是否存在"Heart Rate"内容

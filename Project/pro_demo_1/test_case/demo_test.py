@@ -14,8 +14,8 @@ class HealthTest(ParaCase):
         log.info("user(test_add_heart_rate): " + self.user)
         log.info("passwd(test_add_heart_rate): " + self.passwd)
 
-        # 根据不同用例特定自定义设置（也可以不设置）
-        self.client.implicitly_wait(5)
+        # 根据不同用例特定自定义设置 (注：在本框架中作用不大，见 find_ele 方法)
+        # self.client.implicitly_wait(5)
 
         # 通过Base类调用实例方法 ：self（测试用例实例对象）
         Base.screenshot(self, "home.png")

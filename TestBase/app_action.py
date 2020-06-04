@@ -45,8 +45,8 @@ def get_ios_client(pro_name, current_thread_name_index, connected_ios_device_lis
         # 等待 WDA 服务启动
         client.wait_ready(timeout=gv.WAIT_WDA_READY)
 
-        # 全局默认的元素定位超时时间
-        client.implicitly_wait(gv.IMPLICITY_WAIT)
+        # 设置 client 默认的元素定位超时时间 (注：在本框架中作用不大，见 find_ele 方法)
+        # client.implicitly_wait(gv.IMPLICITY_WAIT)
 
         # 解锁（点亮屏幕）相当于点击了home健
         client.unlock()
@@ -66,6 +66,10 @@ def get_ios_client(pro_name, current_thread_name_index, connected_ios_device_lis
 class Base(object):
 
     def __init__(self, case_instance):
+        """
+        【 备 注 】 更多的元素定位方式，参考 facebook_wda.py 文件
+
+        """
         self.case_instance = case_instance    # 测试用例的实例对象
         self.client = case_instance.client    # 操作 iOS 设备
         self.session = case_instance.session  # 操作 APP 应用
@@ -74,7 +78,7 @@ class Base(object):
 
     def find_ele(self, **kwargs):
         ele = self.session(**kwargs)
-        if ele.exists:
+        if ele.wait(timeout=gv.IMPLICITY_WAIT, raise_error=True):  # 设置 Session 定位等待时间
             return ele
         else:
             raise Exception("元素定位失败")
@@ -91,16 +95,35 @@ class Base(object):
         """
         self.find_ele(*args).click_exists(timeout)
 
-    # 判断页面内容是否存在
     def content_is_exist(self, content, time_out):
+        """
+        判断页面内容是否存在
+        （1）若存在：  True
+        （2）若不存在：False
+        :param content:
+        :param time_out:
+        :return:
+        """
         time_init = 1   # 初始化时间
         polling_interval = 1  # 轮询间隔时间
         while content not in self.session.source():
+        # while not self.session(text=content).exists:
             time.sleep(polling_interval)
             time_init = time_init + 1
             if time_init >= time_out:
                 return False
         return True
+
+    def content_is_gone(self, content, time_out):
+        """
+        判断页面内容是否消失
+        （1）若消失：True
+        （2）若存在：False
+        :param content:
+        :param time_out:
+        :return:
+        """
+        return self.session(text=content).wait_gone(timeout=time_out)
 
     def screenshot(self, image_name):
         """
@@ -135,6 +158,7 @@ class Base(object):
         time_init = 1   # 初始化时间
         polling_interval = 1  # 轮询间隔时间
         while content not in self.session.source():
+        # while not self.session(text=content).exists:
             time.sleep(polling_interval)
             time_init = time_init + 1
             if time_init >= gv.POLLING_CONTENT_TIME_OUT:

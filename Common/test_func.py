@@ -233,8 +233,8 @@ def get_connected_ios_devices_info(pro_name):
 
     # 通过 ps aux 命令 查看 WDA服务连接的iOS设备情况
     cmd_res = subprocess.check_output(["ps", "aux", "|", "grep", "-v", "\"grep\"", "|", "grep", "WebDriverAgentRunner"], shell=True)
-    print(cmd_res)
-    print(type(cmd_res))
+    log.info(cmd_res)
+    log.info(type(cmd_res))
     # 若 iOS 设备对应的 destination 出现在查询结果中则保存入列表
     for ios_device_dict in ios_device_list:
         if "-destination " + ios_device_dict["wda_destination"] in str(cmd_res):
