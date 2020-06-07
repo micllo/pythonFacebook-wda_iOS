@@ -9,10 +9,10 @@ class HealthTest(ParaCase):
 
     """ Health 用 例 集"""
 
-    def test_add_heart_rate(self):
-        """ 测试搜索'添加心率'(通过)  """
-        log.info("user(test_add_heart_rate): " + self.user)
-        log.info("passwd(test_add_heart_rate): " + self.passwd)
+    def test_add_heart_rate_66(self):
+        """ 测试搜索'添加心率66'(通过)  """
+        log.info("user(test_add_heart_rate_66): " + self.user)
+        log.info("passwd(test_add_heart_rate_66): " + self.passwd)
 
         # 根据不同用例特定自定义设置 (注：在本框架中作用不大，见 find_ele 方法)
         # self.client.implicitly_wait(5)
@@ -21,22 +21,22 @@ class HealthTest(ParaCase):
         Base.screenshot(self, "home.png")
 
         add_page = AddPage(self)
-        add_page.add_heart_rate("66")
+        add_page.add_heart_rate_66("66")
         # self.assertIn('test_search', "test_search", "test_search用例测试失败")
 
-    # def test_search_wx(self):
-    #     """ 测试搜索'微信'(失败)  """
-    #     log.info("user(test_search_wx): " + self.user)
-    #     log.info("passwd(test_search_wx): " + self.passwd)
-    #
-    #     search_page = SearchPage(self)
-    #     search_page.search_wx("微信")
-    #
-    # def test_search_bd(self):
-    #     """ 测试搜索'百度'(错误)  """
-    #     log.info("user(test_search_bd): " + self.user)
-    #     log.info("passwd(test_search_bd): " + self.passwd)
-    #
-    #     search_page = SearchPage(self)
-    #     search_page.search_bd("百度")
+    def test_add_heart_rate_33(self):
+        """ 测试搜索'添加心率33'(失败)  """
+        log.info("user(test_add_heart_rate_33): " + self.user)
+        log.info("passwd(test_add_heart_rate_33): " + self.passwd)
+
+        add_page = AddPage(self)
+        add_page.add_heart_rate_33("33")
+
+    def test_add_heart_rate_11(self):
+        """ 测试搜索'添加心率11'(错误)  """
+        log.info("user(test_add_heart_rate_11): " + self.user)
+        log.info("passwd(test_add_heart_rate_11): " + self.passwd)
+
+        add_page = AddPage(self)
+        add_page.add_heart_rate_11("11")
 

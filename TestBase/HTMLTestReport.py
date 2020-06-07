@@ -357,11 +357,12 @@ table       { font-size: 100%; }
     </div>
     """
 
-    # 获取'图片' ( screen_shot_id ) src='data:image/png;base64,%(img_base64)s'
+    # 获取'图片' ( screen_shot_id、width、height )
+    # 另一种方式：src='data:image/png;base64,%(img_base64)s'
     GET_SCREENSHOT_TMPL = r"""
     <div>
     <br><HR align=center width=300color=#987cb9 SIZE=1><br>
-    <img id='img_%(screen_shot_id)s' style='width:540px; height:960px' alt="'%(screen_shot_id)s'图片未显示">
+    <img id='img_%(screen_shot_id)s' style='width:%(width)spx; height:%(height)spx' alt="'%(screen_shot_id)s'图片未显示">
     </div>
     """
 
@@ -613,12 +614,12 @@ class HTMLTestRunner(Template_mixin):
 
     def generateReport(self, suite, result):
         screen_shot_id_dict = suite.screen_shot_id_dict  # 获取截图ID字典
-        ios_device_name_dict = suite.ios_device_name_dict  # 获取使用iOS设备名称字典
+        ios_device_info_dict = suite.ios_device_info_dict  # 获取使用iOS设备信息：name、width、height
         report_attrs = self.getReportAttributes(result)
         generator = 'HTMLTestRunner %s' % __version__
         stylesheet = self._generate_stylesheet()
         heading = self._generate_heading(report_attrs)
-        report = self._generate_report(result, screen_shot_id_dict, ios_device_name_dict)
+        report = self._generate_report(result, screen_shot_id_dict, ios_device_info_dict)
         ending = self._generate_ending()
         script_request = self._script_request()
         output = self.HTML_TMPL % dict(
@@ -653,11 +654,13 @@ class HTMLTestRunner(Template_mixin):
         return heading
 
     # 生成报告
-    def _generate_report(self, result, screen_shot_id_dict, ios_device_name_dict):
+    def _generate_report(self, result, screen_shot_id_dict, ios_device_info_dict):
         """
         :param result:
         :param screen_shot_id_dict: 截图ID字典 -> { "测试类名.测试方法名":['aaa', 'bbb'], "测试类名.测试方法名":['ccc'] }
-        :param ios_device_name_dict: 使用的iOS设备名称字典 -> { "测试类名.测试方法名":"iPhone8(模拟器)", "测试类名.测试方法名":"iPhone7(真机)" }
+        :param ios_device_info_dict: 使用的Android设备信息：name、width、height
+            ->  { "测试类名.测试方法名": {"device_name": "iPhone8(模拟器)", "device_width": "414", "device_height": "896"},
+                  "测试类名.测试方法名": {"device_name": "iPhone7(真机)", "device_width": "540", "device_height": "960"} }
         :return:
         【 显 示 截 图 的 逻 辑 】
          1.根据'测试类名'取出该类下的所有'测试方法'对应的'截图ID列表'的字典 -> { "测试方法名":['aaa', 'bbb'], "测试方法名":['ccc'] }
@@ -706,15 +709,15 @@ class HTMLTestRunner(Template_mixin):
                 if key.split(".")[0] == cls.__name__:
                     screen_shot_id_dict_with_test_method[key.split(".")[1]] = value
 
-            # 根据'测试类名'取出该类下的所有'测试方法'对应的'使用的iOS设备名称'的字典 -> { "测试方法名":"小米5S", "测试方法名":"坚果Pro" }
-            ios_device_name_dict_with_test_method = {}
-            for key, value in ios_device_name_dict.items():
+            # 根据'测试类名'取出该类下的所有'测试方法'对应的'使用的iOS设备名称'的字典
+            ios_device_info_dict_with_test_method = {}
+            for key, value in ios_device_info_dict.items():
                 if key.split(".")[0] == cls.__name__:
-                    ios_device_name_dict_with_test_method[key.split(".")[1]] = value
+                    ios_device_info_dict_with_test_method[key.split(".")[1]] = value
 
             # 为每个'测试用例类'循环添加'测试用例执行结果'模板样式 保存在'rows'列表中
             for tid, (n, t, o, e) in enumerate(cls_results):
-                self._generate_report_test(rows, cid, tid, n, t, o, e, screen_shot_id_dict_with_test_method, ios_device_name_dict_with_test_method)
+                self._generate_report_test(rows, cid, tid, n, t, o, e, screen_shot_id_dict_with_test_method, ios_device_info_dict_with_test_method)
 
         report = self.REPORT_TMPL % dict(
             test_list=''.join(rows),
@@ -726,7 +729,7 @@ class HTMLTestRunner(Template_mixin):
         )
         return report
 
-    def _generate_report_test(self, rows, cid, tid, n, t, o, e, screen_shot_id_dict_with_test_method, ios_device_name_dict_with_test_method):
+    def _generate_report_test(self, rows, cid, tid, n, t, o, e, screen_shot_id_dict_with_test_method, ios_device_info_dict_with_test_method):
         """
         :param rows:
         :param cid:
@@ -736,6 +739,9 @@ class HTMLTestRunner(Template_mixin):
         :param o: 测试过程中输出的内容（一般都是空的）
         :param e: 错误信息、失败的信息
         :param screen_shot_id_dict_with_test_method: { "测试方法名":['aaa', 'bbb'], "测试方法名":['ccc'] }
+        :param ios_device_info_dict_with_test_method:
+                ->  { "测试方法名": {"device_name": "iPhone8(模拟器)", "device_width": "414", "device_height": "896"},
+                      "测试方法名": {"device_name": "iPhone7(真机)", "device_width": "540", "device_height": "960"} }
         :return:
         """
         # 'pt1_1', 'et1_1', 'ft1_1', 支持Bootstrap折叠展开特效
@@ -750,7 +756,10 @@ class HTMLTestRunner(Template_mixin):
         screen_shot_list = screen_shot_id_dict_with_test_method[name]
 
         # 获取该'测试方法'的'使用的iOS设备名称'
-        ios_device_name = ios_device_name_dict_with_test_method[name]
+        device_info = ios_device_info_dict_with_test_method[name]
+        device_name = device_info.get("device_name")
+        device_width = device_info.get("device_width")
+        device_height = device_info.get("device_height")
 
         # 获取'截图按钮'样式
         if screen_shot_list:
@@ -764,13 +773,13 @@ class HTMLTestRunner(Template_mixin):
             get_screenshot_tmpl_list = ""
             for i, screen_shot_id in enumerate(screen_shot_list):
                 self.img_id_list.append(screen_shot_id)  # 将截图id添加到总列表中
-                get_screenshot_tmpl_list += self.GET_SCREENSHOT_TMPL % dict(screen_shot_id=screen_shot_id)
+                get_screenshot_tmpl_list += self.GET_SCREENSHOT_TMPL % dict(screen_shot_id=screen_shot_id, width=device_width, height=device_height)
             show_img_div_tmpl = self.SHOW_SCREENSHOT_DIV_TMPL % dict(tid=tid, get_screenshot_tmpl_list=get_screenshot_tmpl_list)
 
         # 获取测试方法中的 __doc__, 并加上（使用的iOS设备名称）
         doc = t.shortDescription() or ""
         desc = doc and ('%s: %s' % (name, doc)) or name
-        desc = desc + " <" + ios_device_name + ">"
+        desc = desc + " [" + device_name + "]"
 
         # 若n==0表示通过，则使用'通过'的样式，否则使用'失败'或'错误'的样式
         tmpl = n == 0 and self.REPORT_TEST_FOR_PASS_TMPL or self.REPORT_TEST_FOR_EF_TMPL

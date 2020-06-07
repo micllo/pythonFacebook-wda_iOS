@@ -4,8 +4,8 @@ import time
 wda.DEBUG = False  # 显示每个与WDA服务的HTTP请求的信息
 wda.HTTP_TIMEOUT = 60.0  # 设置与WDA服务的HTTP请求超时时间
 
-c = wda.Client('http://localhost:8100')  # 设备连接
-# c = wda.Client('http://localhost:8200')  # 设备连接
+# c = wda.Client('http://localhost:8100')  # 设备连接
+c = wda.Client('http://localhost:8200')  # 设备连接
 print(c.status())
 print()
 
@@ -14,6 +14,10 @@ c.wait_ready(timeout=300)  # 等待300s，默认120s
 
 # 全局默认的元素定位超时时间5秒
 c.implicitly_wait(15.0)
+
+width, height = c.window_size()
+print(width)
+print(height)
 
 """
     测 试 步 骤
@@ -38,72 +42,72 @@ with c.session('com.apple.Health') as s:
     print(s.bundle_id, s.id)
     print(s.source())
 
-    # 1.从屏幕'正中间'往'顶部'划动（效果：屏幕往'下'翻动）
-    s.swipe_up()
-    # # 从屏幕'正中间'往'底部'划（效果：屏幕往'上'翻动）
-    # s.swipe_down()
-    # # 从屏幕'中间最右侧'往'中间最左侧'划（效果：屏幕往'右'翻动）
-    # s.swipe_left()
-    # # 从屏幕'中间最左侧'往'中间最右侧'划（效果：屏幕往'左'翻动）
-    # s.swipe_right()
-    time.sleep(2)
-
-    # 2.点击 Browse 图标
-    # s.tap(315, 846)
-    # s(xpath='//XCUIElementTypeButton[@name="Browse"]').click_exists(timeout=3.0)
-    # s(name='Browse').click_exists(timeout=3.0)
-    s(nameContains='Bro').click_exists(timeout=3.0)  # 匹配name文本包含的内容
-    time.sleep(2)
-
-    # 3.输入框搜索 Heart
-    # search_input = s(xpath='//XCUIElementTypeSearchField[@name="Search"]')
-    # search_input = s(label="Search")
-    search_input = s(name="Search123456")
-    print("search_input.name : " + str(search_input.name))
-    print("search_input.bounds.x : " + str(search_input.bounds.x))
-    print("search_input.bounds.y : " + str(search_input.bounds.y))
-    print("search_input.bounds.width : " + str(search_input.bounds.width))
-    print("search_input.bounds.height : " + str(search_input.bounds.height))
-    search_input.click_exists(timeout=3.0)
-    time.sleep(1)
-    search_input.set_text("Heart")
-    time.sleep(2)
-
-    # 4.等待"Nutrition"内容消失
-    s(text='Nutrition').wait_gone(timeout=3.0)
-    print("内容 Nutrition 是否存在: " + str(s(text="Nutrition").exists()))
-    time.sleep(2)
-
-    # 5.判断是否存在"Heart Rate"内容
-    print("内容 Heart Rate 是否存在：" + str(s(text="Heart Rate").exists))
-    time.sleep(2)
-
-    # 6.点击"Heart Rate"进入
-    s(nameContains="BPM").click()
-    time.sleep(2)
-
-    # 7.点击"Add Data"
-    # s.tap(360, 70)
-    # s(xpath='//XCUIElementTypeButton[@name="Add Data"]').click()
-    s(xpath='//NavigationBar/Button[2]').click()
-    # s(name="Add Data").click()
-    time.sleep(2)
-
-    # 8.在'BPM'中输入 66
-    bpm_input = s(xpath='//XCUIElementTypeTextField[@name="BPM"]')
-    # bpm_input = s(label="BPM")
-    bpm_input.click()
-    bpm_input.set_text("66")
-    time.sleep(2)
-
-    # 9.点击'Add'
-    s(xpath='//XCUIElementTypeButton[@name="Add"]').click()
-    # s(label="Add").click()
-    time.sleep(5)
-
-    # 截屏
-    # print(s.screenshot('test_wda.png'))
-    # print(s.screenshot().save("test_wda2.jpg"))
+    # # 1.从屏幕'正中间'往'顶部'划动（效果：屏幕往'下'翻动）
+    # s.swipe_up()
+    # # # 从屏幕'正中间'往'底部'划（效果：屏幕往'上'翻动）
+    # # s.swipe_down()
+    # # # 从屏幕'中间最右侧'往'中间最左侧'划（效果：屏幕往'右'翻动）
+    # # s.swipe_left()
+    # # # 从屏幕'中间最左侧'往'中间最右侧'划（效果：屏幕往'左'翻动）
+    # # s.swipe_right()
+    # time.sleep(2)
+    #
+    # # 2.点击 Browse 图标
+    # # s.tap(315, 846)
+    # # s(xpath='//XCUIElementTypeButton[@name="Browse"]').click_exists(timeout=3.0)
+    # # s(name='Browse').click_exists(timeout=3.0)
+    # s(nameContains='Bro').click_exists(timeout=3.0)  # 匹配name文本包含的内容
+    # time.sleep(2)
+    #
+    # # 3.输入框搜索 Heart
+    # # search_input = s(xpath='//XCUIElementTypeSearchField[@name="Search"]')
+    # # search_input = s(label="Search")
+    # search_input = s(name="Search123456")
+    # print("search_input.name : " + str(search_input.name))
+    # print("search_input.bounds.x : " + str(search_input.bounds.x))
+    # print("search_input.bounds.y : " + str(search_input.bounds.y))
+    # print("search_input.bounds.width : " + str(search_input.bounds.width))
+    # print("search_input.bounds.height : " + str(search_input.bounds.height))
+    # search_input.click_exists(timeout=3.0)
+    # time.sleep(1)
+    # search_input.set_text("Heart")
+    # time.sleep(2)
+    #
+    # # 4.等待"Nutrition"内容消失
+    # s(text='Nutrition').wait_gone(timeout=3.0)
+    # print("内容 Nutrition 是否存在: " + str(s(text="Nutrition").exists()))
+    # time.sleep(2)
+    #
+    # # 5.判断是否存在"Heart Rate"内容
+    # print("内容 Heart Rate 是否存在：" + str(s(text="Heart Rate").exists))
+    # time.sleep(2)
+    #
+    # # 6.点击"Heart Rate"进入
+    # s(nameContains="BPM").click()
+    # time.sleep(2)
+    #
+    # # 7.点击"Add Data"
+    # # s.tap(360, 70)
+    # # s(xpath='//XCUIElementTypeButton[@name="Add Data"]').click()
+    # s(xpath='//NavigationBar/Button[2]').click()
+    # # s(name="Add Data").click()
+    # time.sleep(2)
+    #
+    # # 8.在'BPM'中输入 66
+    # bpm_input = s(xpath='//XCUIElementTypeTextField[@name="BPM"]')
+    # # bpm_input = s(label="BPM")
+    # bpm_input.click()
+    # bpm_input.set_text("66")
+    # time.sleep(2)
+    #
+    # # 9.点击'Add'
+    # s(xpath='//XCUIElementTypeButton[@name="Add"]').click()
+    # # s(label="Add").click()
+    # time.sleep(5)
+    #
+    # # 截屏
+    # # print(s.screenshot('test_wda.png'))
+    # # print(s.screenshot().save("test_wda2.jpg"))
 
 
 
