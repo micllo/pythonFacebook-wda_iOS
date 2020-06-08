@@ -21,6 +21,12 @@ REPORT_PATH = "/test_report_local/"
 # Mongo 端口
 MONGO_PORT = "27017"
 
+# WDA 服务
+WDA_SERVER_HOST = SERVER_IP
+WDA_SERVER_PORT = "22"
+WDA_SERVER_USER = "micllo"
+WDA_SERVER_PASSWD = "abc123"
+
 
 ############################################# 相 同 的 配 置 #############################################
 

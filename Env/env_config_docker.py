@@ -7,7 +7,7 @@ SCREENSHOTS_DIR = "/opt/project/screenshots/"
 
 # 服务器地址
 # SERVER_IP_PORT = "192.168.3.102"  #  MERCURY_1602
-SERVER_IP = "192.168.31.10"  # Demba Ba
+SERVER_IP = "192.168.31.9"  # Demba Ba  192.168.31.10
 
 # Nginx 端口
 NGINX_PORT = "1080"
@@ -20,6 +20,12 @@ REPORT_PATH = "/test_report/"
 
 # Mongo 端口（ docker 多项目需要映射不同的端口 ）
 MONGO_PORT = "27067"
+
+# WDA 服务
+WDA_SERVER_HOST = SERVER_IP
+WDA_SERVER_PORT = "22"
+WDA_SERVER_USER = "micllo"
+WDA_SERVER_PASSWD = "abc123"
 
 
 ############################################# 相 同 的 配 置 #############################################

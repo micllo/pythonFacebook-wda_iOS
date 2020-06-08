@@ -118,7 +118,7 @@ sudo nginx -s reload
  验证地址：http://localhost:8100/status
   < 备 注 >
  （1）仅针对使用真机的情况
- （2）有些国产的iPhone机器通过手机的IP和端口还不能访问，此时需要将手机的端口转发到Mac上
+ （2）有些国产iPhone无法通过手动的IP和端口进行访问，需要通过iproxy命令，将手机的端口转发到Mac上
 
 
 【 启 动 多 个 WDA 服 务 的 方 法 】
@@ -275,6 +275,9 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
      （3）在服务器中进行部署操作：停止nginx、mongo、uwsgi服务 -> 替换项目、uwsgi.ini配置文件 -> 替换config配置文件 -> 启动nginx、mongo、uwsgi服务
      （4）删除本地的临时文件夹
       命令：gulp "deploy docker" -> 编译后 部署docker服务
+
+    2.需要在本地启动相关模拟器或真机
+      命令：gulp "start env_docker"
 
 
 ########################################################################################################################

@@ -7,6 +7,7 @@ from Env import env_config as cfg
 from dateutil import parser
 from Tools.date_helper import get_current_iso_date
 import subprocess
+from fabric.api import *
 
 
 def generate_report(pro_name, suite, title, description, tester, verbosity=1):
@@ -213,17 +214,21 @@ def stop_case_run_status(pro_name, test_method_name):
 def get_connected_ios_devices_info(pro_name):
     """
     【 获取 已连接的 iOS 设备信息列表 】
-     1.获取 配置的 iOS 设备信息列表
-     2.通过 ps aux 命令 查看 WDA服务连接的iOS设备情况
+     1.通过'SSH'登录'WDA'服务器
+     2.获取 配置的 iOS 设备信息列表
+     3.通过 ps aux 命令 查看 WDA服务连接的iOS设备情况
      （1）-destination "platform=iOS Simulator,name=iPhone 8"
      （2）-destination "platform=iOS Simulator,name=iPhone 11"
      （3）-destination "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb"
-     3.将'已连接'的设备修改其对应的'thread_index'，并保存入列表
-     4.将'未连接'的设备，发送钉钉通知
+     4.将'已连接'的设备修改其对应的'thread_index'，并保存入列表
+     5.将'未连接'的设备，发送钉钉通知
 
      :return: 已连接设备信息列表
 
-    【 备注 】若 SSH 登录失败，则返回 空列表
+    【 备注 】
+    1.若 SSH 登录失败，则返回 空列表
+    2.本地执行命令：subprocess.check_output(["ps", "aux", "|", "grep", "-v", "\"grep\"", "|", "grep", "WebDriverAgentRunner"], shell=True)
+
     """
     # 获取 配置的 iOS 设备信息列表
     from Config.pro_config import config_ios_device_list
@@ -231,19 +236,23 @@ def get_connected_ios_devices_info(pro_name):
     device_num = 0
     connected_ios_device_list = []
 
-    # 通过 ps aux 命令 查看 WDA服务连接的iOS设备情况
-    cmd_res = subprocess.check_output(["ps", "aux", "|", "grep", "-v", "\"grep\"", "|", "grep", "WebDriverAgentRunner"], shell=True)
-    log.info(cmd_res)
-    log.info(type(cmd_res))
-    # 若 iOS 设备对应的 destination 出现在查询结果中则保存入列表
-    for ios_device_dict in ios_device_list:
-        if "-destination " + ios_device_dict["wda_destination"] in str(cmd_res):
-            device_num += 1
-            connected_ios_device_dict = ios_device_dict
-            connected_ios_device_dict["thread_index"] = device_num
-            connected_ios_device_list.append(connected_ios_device_dict)
-        else:
-            send_DD_for_FXC(title=pro_name, text="#### " + pro_name + " 项目 " + ios_device_dict["device_name"] + " 设 备 未 连 接 WDA 服 务")
+    with settings(host_string="%s@%s:%s" % (cfg.WDA_SERVER_USER, cfg.WDA_SERVER_HOST, cfg.WDA_SERVER_PORT),
+                  password=cfg.WDA_SERVER_PASSWD):
+        try:
+            cmd_res = run("ps -ef | grep -v \"grep\" | grep WebDriverAgentRunner", warn_only=True)  # 忽略失败的命令,继续执行
+            # 若 iOS 设备对应的 destination 出现在查询结果中则保存入列表
+            for ios_device_dict in ios_device_list:
+                if "-destination " + ios_device_dict["wda_destination"] in str(cmd_res):
+                    device_num += 1
+                    connected_ios_device_dict = ios_device_dict
+                    connected_ios_device_dict["thread_index"] = device_num
+                    connected_ios_device_list.append(connected_ios_device_dict)
+                else:
+                    send_DD_for_FXC(title=pro_name, text="#### " + pro_name + " 项目 " + ios_device_dict["device_name"] + " 设 备 未 连 接 WDA 服 务")
+        except Exception as e:
+            print(str(e))
+            send_DD_for_FXC(title=pro_name, text="#### " + pro_name + " 项目 通过'SSH'登录'WDA'服务器失败，无法获取iOS设备连接情况")
+
     return connected_ios_device_list
 
 
