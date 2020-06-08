@@ -21,8 +21,8 @@ class AddPage(Base):
 
     # 搜索文本框
     def search_field(self):
-        # return self.find_ele(xpath='//XCUIElementTypeSearchField[@name="Search"]')
-        return self.find_ele(label="Search")
+        return self.find_ele(xpath='//XCUIElementTypeSearchField[@name="Search"]')
+        # return self.find_ele(label="Search")
         # return self.find_ele(name="Search")
 
     # "心率"tab

@@ -9,11 +9,11 @@
 （1）get_test_class_list        通过'项目名'获取'测试类'列表
 （2）pro_exist                  判断项目名称是否存在
 （3）get_login_accout           通过'线程名的索引' 获取登录账号
-（4）get_app_info               通过项目名称 获取APP信息 （ appPackage ）
+（4）get_app_info               通过项目名称 获取APP信息 （ bundleId ）
 （5）config_ios_device_list     配置'iOS'设备信息列表
 
 【 未 解 决 的 问 题 】
-1.若长时间未运行，第一次运行后会报错连接失败，之后再执行就正常了
+1.有时在长时间未运行后的第一次运行会报错连接失败，之后再执行就正常了
 
 
 【 关于 本地 gulp 部 署 前 的 注 意 事 项 】
@@ -106,8 +106,8 @@ sudo nginx -s reload
 
 【 开 启 服 务 】
 1.在设备中启动'WebDriverAgent'服务，开启监听端口（默认8100）
- 终端命令（真机）  ：xcodebuild -project ../WebDriverAgent.xcodeproj  -scheme WebDriverAgentRunner  -destination "id=$UDID"  test
- 终端命令（模拟器）：xcodebuild -project ../WebDriverAgent.xcodeproj  -scheme WebDriverAgentRunner  -destination "platform=iOS Simulator,name=iPhone 8"  test
+ 终端命令（真机）  ：xcodebuild test -project ../WebDriverAgent.xcodeproj  -scheme WebDriverAgentRunner  -destination "id=$UDID"
+ 终端命令（模拟器）：xcodebuild test -project ../WebDriverAgent.xcodeproj  -scheme WebDriverAgentRunner  -destination "platform=iOS Simulator,name=iPhone 8"
   < 备 注 >
  （1）原理：通过命令将 WebDriverAgent 应用安装在设备上并启动WDA监听服务，使设备与电脑保持通信
  （2）真机必须与电脑通过 USB 一直连接着
@@ -310,7 +310,7 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 （5）提供日志记录功能：按照日期区分
 （6）提供定时任务：定时删除过期(一周前)的文件：日志、报告、截图文件(mongo数据)，定时执行测试用例
 （7）提供页面展示项目用例，实现用例上下线、批量执行用例、显示报告、用例运行进度等功能
-（8）多线程并发处理方式：????
+（8）多线程并发处理方式：先通过'ps aux'命令查看'WebDriverAgentRunner'服务连接的iOS设备情况、再将'已连接'的设备列表数量 作为 并发线程数量
 
 2.使用 Flask ：
 （1）提供 执行用例的接口
