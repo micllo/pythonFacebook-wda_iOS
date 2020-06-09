@@ -220,8 +220,11 @@ def get_connected_ios_devices_info(pro_name):
      （1）-destination "platform=iOS Simulator,name=iPhone 8"
      （2）-destination "platform=iOS Simulator,name=iPhone 11"
      （3）-destination "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb"
-     4.将'已连接'的设备修改其对应的'thread_index'，并保存入列表
+     4.将'已连接'的设备增加其对应的'thread_index'，并保存入列表
      5.将'未连接'的设备，发送钉钉通知
+
+     [ { "thread_index": 1, "device_name": "iPhone8(模拟器)", "wda_port": "8100", "wda_destination": "platform=iOS Simulator,name=iPhone 8" } } ,
+       { "thread_index": 2, "device_name": "iPhone7(真机)", "wda_port": "8200", "wda_destination": "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb" } } ]
 
      :return: 已连接设备信息列表
 
@@ -264,5 +267,4 @@ if __name__ == "__main__":
     # stop_case_run_status("pro_demo_1", "test_demo_01")
 
     print(get_connected_ios_devices_info("pro_demo_1"))
-
 

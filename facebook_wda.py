@@ -19,6 +19,8 @@ width, height = c.window_size()
 print(width)
 print(height)
 
+c.unlock()
+
 """
     测 试 步 骤
     1.从屏幕底部往上划
@@ -42,16 +44,58 @@ with c.session('com.apple.Health') as s:
     print(s.bundle_id, s.id)
     print(s.source())
 
-    # # 1.从屏幕'正中间'往'顶部'划动（效果：屏幕往'下'翻动）
-    # s.swipe_up()
+    # 1.从屏幕'正中间'往'顶部'划动（效果：屏幕往'下'翻动）
+    s.swipe_up()
     # # # 从屏幕'正中间'往'底部'划（效果：屏幕往'上'翻动）
     # # s.swipe_down()
     # # # 从屏幕'中间最右侧'往'中间最左侧'划（效果：屏幕往'右'翻动）
     # # s.swipe_left()
     # # # 从屏幕'中间最左侧'往'中间最右侧'划（效果：屏幕往'左'翻动）
     # # s.swipe_right()
-    # time.sleep(2)
-    #
+    time.sleep(2)
+
+    # 点击'身体测量'
+    s(name='身体测量').click_exists(timeout=3.0)
+    time.sleep(2)
+
+    # 点击'体重'
+    s(name='体重').click_exists(timeout=3.0)
+    time.sleep(2)
+
+    # 点击'添加'
+    s(name='添加').click_exists(timeout=3.0)
+    time.sleep(2)
+
+    # '公斤'输入框 输入 65
+    tz = s(name='公斤')
+    tz.click()
+    tz.set_text("65")
+    time.sleep(2)
+
+    # 点击'添加'
+    s(name='添加').click_exists(timeout=3.0)
+    time.sleep(2)
+
+    # 验证 平均值 文本
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # # 2.点击 Browse 图标
     # # s.tap(315, 846)
     # # s(xpath='//XCUIElementTypeButton[@name="Browse"]').click_exists(timeout=3.0)

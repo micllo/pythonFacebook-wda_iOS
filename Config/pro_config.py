@@ -59,9 +59,9 @@ def get_app_bundleId(pro_name):
 def config_ios_device_list():
     """
     配置 iOS 设备信息 列表
-    [ { "thread_index": 1, "device_name": "iPhone8(模拟器)", "wda_port": "8100", "wda_destination": "platform=iOS Simulator,name=iPhone 8" } } ,
-      { "thread_index": 2, "device_name": "iPhone11(模拟器)", "wda_port": "8200", "wda_destination": "platform=iOS Simulator,name=iPhone 11" } }, ]
-      { "thread_index": 2, "device_name": "iPhone7(真机)", "wda_port": "8200", "wda_destination": "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb" } } ]
+    [ { "device_name": "iPhone8(模拟器)", "wda_port": "8100", "wda_destination": "platform=iOS Simulator,name=iPhone 8" } } ,
+      { "device_name": "iPhone11(模拟器)", "wda_port": "8200", "wda_destination": "platform=iOS Simulator,name=iPhone 11" } }, ]
+      { "device_name": "iPhone7(真机)", "wda_port": "8200", "wda_destination": "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb" } } ]
 
     【 备 注 】
     'wda_port'：WDA服务的启动端口（可以通过修改WebDriverAgent项目进行调整）
@@ -72,24 +72,21 @@ def config_ios_device_list():
     ios_device_info_list = []
 
     iphone8 = dict()
-    iphone8["thread_index"] = 1
     iphone8["device_name"] = "iPhone8(模拟器)"
     iphone8["wda_port"] = "8100"
     iphone8["wda_destination"] = "platform=iOS Simulator,name=iPhone 8"
     ios_device_info_list.append(iphone8)
 
     iphone11 = dict()
-    iphone11["thread_index"] = 2
     iphone11["device_name"] = "iPhone11(模拟器)"
     iphone11["wda_port"] = "8200"
     iphone11["wda_destination"] = "platform=iOS Simulator,name=iPhone 11"
     ios_device_info_list.append(iphone11)
 
-    # iphone7 = dict()
-    # iphone7["thread_index"] = 2
-    # iphone7["device_name"] = "iPhone7(真机)"
-    # iphone7["wda_port"] = "8200"
-    # iphone7["wda_destination"] = "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb"
-    # ios_device_info_list.append(iphone7)
+    iphone7 = dict()
+    iphone7["device_name"] = "iPhone7(真机)"
+    iphone7["wda_port"] = "8100"
+    iphone7["wda_destination"] = "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb"
+    ios_device_info_list.append(iphone7)
 
     return ios_device_info_list

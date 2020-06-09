@@ -17,7 +17,7 @@
 
 
 【 关于 本地 gulp 部 署 前 的 注 意 事 项 】
-1.在通过'xcodebuile'命令启动WDA服务前，需要先通过'XCode'工具手动启动'WebDriverAgent'项目，并确认是否能正常启动
+1.在通过'xcodebuile'命令启动WDA服务前，需要先通过'XCode'工具手动启动'WebDriverAgent'项目，并确认是否能正常启动（ 模拟器、真机 ）
 
 
 
@@ -142,8 +142,8 @@ xcodebuild test -project /Users/micllo/Documents/works/GitHub/WDA_iOS/8100/WebDr
 < iPhone 11 模 拟 器 （ WDA 8200 端 口 ）>
 xcodebuild test -project /Users/micllo/Documents/works/GitHub/WDA_iOS/8200/WebDriverAgent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination "platform=iOS Simulator,name=iPhone 11"
 
-< iPhone 7 真 机 （ WDA 8200 端 口 ）>
-xcodebuild test -project /Users/micllo/Documents/works/GitHub/WDA_iOS/8200/WebDriverAgent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb"
+< iPhone 7 真 机 （ WDA 8100 端 口 ）>
+xcodebuild test -project /Users/micllo/Documents/works/GitHub/WDA_iOS/8100/WebDriverAgent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination "id=3cbb25d055753f2305ec70ba6dede3dca5d500bb"
 
 # 打开模拟器应用（ 若模拟器未打开的情况 ）
 open "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app/"
@@ -157,9 +157,12 @@ ps -ef | grep -v "grep" | grep WebDriverAgentRunner
 ps -ef | grep -v "grep" | grep WebDriverAgentRunner | awk '{print $2}' | xargs kill -9
 
 # 真机 端口映射
-iproxy 8200 8200
+iproxy 8100 8100
 ps -ef | grep -v "grep" | grep iproxy
 ps -ef | grep -v "grep" | grep iproxy | awk '{print $2}' | xargs kill -9
+
+# 查询 映射情况
+http://localhost:8200/status
 
 
 ########################################################################################################################
