@@ -18,7 +18,9 @@
 
 【 关于 本地 gulp 部 署 前 的 注 意 事 项 】
 1.在通过'xcodebuile'命令启动WDA服务前，需要先通过'XCode'工具手动启动'WebDriverAgent'项目，并确认是否能正常启动（ 模拟器、真机 ）
-
+2.使用真机测试时，通过'iproxy'命令映射端口后，若发现 'http://localhost:8100/status'地址没有响应
+  原因：可能是由于真机设置了锁屏功能，端口映射时无法解锁真机导致映射失败
+  解决：手动解锁真机的锁屏功能，WDA服务会自动映射端口
 
 
 ########################################################################################################################
@@ -33,7 +35,7 @@
 
 2.配置 gulpfile 依赖
 （1）修改：gulpfile_install.sh
-（2）删除：原有的 package.json 文件
+（2）删除：原有的 package.json 文件、node_modules目录
 （3）执行：sh -x gulpfile_install.sh
 
 3.配置 Nginx -> python_facebook_wda_iOS.conf
@@ -127,7 +129,7 @@ sudo nginx -s reload
 （2）../WDA_iOS/8200/WebDriverAgent/WebDriverAgent.xcodeproj
 2.通过Xcode进行配置调试成功
 3.进入第二个项目，将8100端口改成8200，然后保存（ 搜索"8100"，可找到两处）
-4.通过 xcodebuild 命令，分别启动两个项目，各自对应的端口为：8100、8200
+4.通过 xcodebuild 命令，分别将两个项目安装入对应的设备中，并启动相应的监听端口：8100、8200
 
 
 -----------------------------------------------
@@ -152,11 +154,11 @@ open "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app/"
 xcrun simctl list
 xcrun simctl list devices
 
-# 查看启动设备进程
+# 查看 WDA服务 进程
 ps -ef | grep -v "grep" | grep WebDriverAgentRunner
 ps -ef | grep -v "grep" | grep WebDriverAgentRunner | awk '{print $2}' | xargs kill -9
 
-# 真机 端口映射
+# 查看 真机 端口映射 进程
 iproxy 8100 8100
 ps -ef | grep -v "grep" | grep iproxy
 ps -ef | grep -v "grep" | grep iproxy | awk '{print $2}' | xargs kill -9
@@ -217,7 +219,7 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 'Docker'中无法获取通过'USB'连接的真机设备
 
 [ 环 境 配 置 方 案 ]
-1.在 mac_mini 上启用一个Docker容器：监控服务
+1.在 mac_mini | centos 上启用一个Docker容器：监控服务
 2.在 mac_mini 主机上安装相应工具和服务，并配置iOS设备的连接
 （1）若使用真机，则需要USB连接电脑
 （2）使用'xcodebuild'命令将WDA服务安装入真机或模拟器中并启动端口

@@ -55,6 +55,8 @@ def get_ios_client(pro_name, current_thread_name_index, connected_ios_device_lis
         log.error(("显示异常：" + str(e)))
         if "Failed to establish a new connection" in str(e):
             error_msg = pro_name + " 项目 " + device_name + " 设备 启动 WDA 服务 失败"
+        elif "ConnectionResetError" in str(e):
+            error_msg = pro_name + " 项目 " + device_name + " 设备 监听端口可能未启动"
         else:
             error_msg = pro_name + "项目 " + device_name + " 设备 启动 WDA 服务的其他异常情况"
         send_DD_for_FXC(title=pro_name, text="#### " + error_msg + "")

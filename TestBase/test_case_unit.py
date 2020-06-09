@@ -47,7 +47,7 @@ class ParaCase(unittest.TestCase):
 
         # 获取'iOS'驱动、设备名称
         self.client, self.device_name = get_ios_client(self.pro_name, self.current_thread_name_index,
-                                                           self.connected_ios_device_list)
+                                                        self.connected_ios_device_list)
 
         # 获取设备屏幕分辩率(width、height)，供报告中的截图适用
         self.device_width = str(self.client.window_size()[0])
