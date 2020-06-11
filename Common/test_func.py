@@ -251,7 +251,7 @@ def get_connected_ios_devices_info(pro_name):
                     connected_ios_device_dict["thread_index"] = device_num
                     connected_ios_device_list.append(connected_ios_device_dict)
                 else:
-                    send_DD_for_FXC(title=pro_name, text="#### " + pro_name + " 项目 " + ios_device_dict["device_name"] + " 设 备 未 连 接 WDA 服 务")
+                    send_DD_for_FXC(title=pro_name, text="#### " + pro_name + " 项目 " + ios_device_dict["device_name"] + " 设 备 未 启 动 WDA 监 听 服 务")
         except Exception as e:
             print(str(e))
             send_DD_for_FXC(title=pro_name, text="#### " + pro_name + " 项目 通过'SSH'登录'WDA'服务器失败，无法获取iOS设备连接情况")

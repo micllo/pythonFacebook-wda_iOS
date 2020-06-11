@@ -20,17 +20,17 @@ def get_ios_client(pro_name, current_thread_name_index, connected_ios_device_lis
     :return:
 
     【 步 骤 】
-    1.通过'当前线程名索引' 获取已连接设备列表中对应的'Android'设备信息和'Appium'服务
+    1.通过'当前线程名索引' 获取已连接设备列表中对应的'iOS'设备信息和'Appium'服务
     2.获取设备驱动
     """
 
     # 通过'当前线程名索引' 获取已连接设备列表中对应的'iOS'设备信息
     device_name = None
     wda_port = None
-    for connected_android_devices_dict in connected_ios_device_list:
-        if current_thread_name_index == connected_android_devices_dict["thread_index"]:
-            wda_port = connected_android_devices_dict["wda_port"]
-            device_name = connected_android_devices_dict["device_name"]
+    for connected_ios_devices_dict in connected_ios_device_list:
+        if current_thread_name_index == connected_ios_devices_dict["thread_index"]:
+            wda_port = connected_ios_devices_dict["wda_port"]
+            device_name = connected_ios_devices_dict["device_name"]
             break
     log.info("\n\n")
     log.info("device_name -> " + device_name)

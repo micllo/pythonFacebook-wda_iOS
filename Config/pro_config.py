@@ -50,10 +50,10 @@ def get_app_bundleId(pro_name):
 
     """
     if pro_name == "pro_demo_1":  # 应用宝
-        app_package = "com.apple.Health"
+        app_bundleId = "com.apple.Health"
     else:
-        app_package = None
-    return app_package
+        app_bundleId = None
+    return app_bundleId
 
 
 def config_ios_device_list():
