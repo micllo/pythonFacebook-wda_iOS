@@ -9,7 +9,7 @@
 （1）get_test_class_list        通过'项目名'获取'测试类'列表
 （2）pro_exist                  判断项目名称是否存在
 （3）get_login_accout           通过'线程名的索引' 获取登录账号
-（4）get_app_info               通过项目名称 获取APP信息 （ bundleId ）
+（4）get_app_bundleId           通过项目名称 获取APP应用的'bundleId'
 （5）config_ios_device_list     配置'iOS'设备信息列表
 
 【 未 解 决 的 问 题 】
@@ -124,12 +124,17 @@ sudo nginx -s reload
 
 
 【 启 动 多 个 WDA 服 务 的 方 法 】
-1.创建两个 WebDriverAgent 项目
+1.创建两个 WebDriverAgent 项目，并通过Xcode进行配置调试成功
 （1）../WDA_iOS/8100/WebDriverAgent/WebDriverAgent.xcodeproj
 （2）../WDA_iOS/8200/WebDriverAgent/WebDriverAgent.xcodeproj
-2.通过Xcode进行配置调试成功
-3.进入第二个项目，将8100端口改成8200，然后保存（ 搜索"8100"，可找到两处）
-4.通过 xcodebuild 命令，分别将两个项目安装入对应的设备中，并启动相应的监听端口：8100、8200
+2.进入第二个项目，将8100端口改成8200，然后保存（ 搜索"8100"，可找到两处）
+3.通过 xcodebuild 命令，分别将两个项目安装入对应的设备中，并启动相应的监听端口：8100、8200
+
+
+【 Openatx/Facebook-wda 框 架 多 线 程 并 发 处 理 方 式 】
+1.创建多个 WebDriverAgent 项目，并将他们默认的端口号设置成不一样：8100、8200、8300，并通过Xcode将它们分别配置调式成功
+2.通过xcodebuild命令 分别将不同端口的 WebDriverAgent 安装在不同的设备上，并启动WDA监控服务
+3.通过’ps aux’命令查看’WebDriverAgentRunner’服务连接的IOS设备情况，将’已连接’的设备列表数量 作为 并发线程数量
 
 
 -----------------------------------------------
