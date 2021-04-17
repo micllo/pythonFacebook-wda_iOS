@@ -18,6 +18,9 @@
 
 【 关于 本地 gulp 部 署 前 的 注 意 事 项 】
 1.在通过'xcodebuile'命令启动WDA服务前，需要先通过'XCode'工具手动启动'WebDriverAgent'项目，并确认是否能正常启动（ 模拟器、真机 ）
+   使用真机设备时，需要在真机上进行设备授信确认
+   （1）菜单栏：Product---> Test
+   （2）若使用真机：则打开设置 --> 通用 --> 描述文件与设备管理 --> 开发者App ，设置Apple Development xxxxx 在此iPhone上受信
 2.使用真机测试时，通过'iproxy'命令映射端口后，若发现 'http://localhost:8100/status'地址没有响应
   原因：可能是由于真机设置了锁屏功能，端口映射时无法解锁真机导致映射失败
   解决：手动解锁真机的锁屏功能，WDA服务会自动映射端口
@@ -120,7 +123,7 @@ sudo nginx -s reload
  验证地址：http://localhost:8100/status
   < 备 注 >
  （1）仅针对使用真机的情况
- （2）有些国产iPhone无法通过手动的IP和端口进行访问，需要通过iproxy命令，将手机的端口转发到Mac上
+ （2）有些国产iPhone无法通过手机的IP和端口进行访问，需要通过iproxy命令，将手机的端口转发到Mac上
 
 
 【 启 动 多 个 WDA 服 务 的 方 法 】
@@ -229,6 +232,8 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 （1）若使用真机，则需要USB连接电脑
 （2）使用'xcodebuild'命令将WDA服务安装入真机或模拟器中并启动端口
 （3）有些真机无法通过IP和端口访问，需要通过'iproxy'命令将设备的端口映射到电脑上
+（4）获取已连接的iOS设备信息列表：需要通过SSH命令从Docker登录到mac_mini宿主机上，然后使用宿主机上的相关命令
+     < 原因：相关XCold工具都是安装在宿主机上的 >
 
 
 ------------------------------------------
@@ -271,11 +276,11 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
     ( 备注：uwgsi 启动 8081 端口、nginx 配置 80 反向代理 8081 )
 
 7.访问地址（ 外部访问 ）：
-（1）用例页面 -> http://192.168.31.10:1080/api/iOS/index
-（2）测试报告 -> http://192.168.31.10:1080/test_report/<pro_name>/[iOS_report]<pro_name>.html
-（3）接口地址 -> http://192.168.31.10:1080/api/
-               http://192.168.31.10:1080/api/iOS/sync_run_case
-               http://192.168.31.10:1080/api/iOS/get_img/5e5cac9188121299450740b3
+（1）用例页面 -> http://192.168.31.9:1080/api/iOS/index
+（2）测试报告 -> http://192.168.31.9:1080/test_report/<pro_name>/[iOS_report]<pro_name>.html
+（3）接口地址 -> http://192.168.31.9:1080/api/
+               http://192.168.31.9:1080/api/iOS/sync_run_case
+               http://192.168.31.9:1080/api/iOS/get_img/5e5cac9188121299450740b3
     ( 备注：docker 配置 1080 映射 80 )
 
 8.关于部署

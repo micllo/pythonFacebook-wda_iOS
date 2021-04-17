@@ -32,10 +32,10 @@ def get_ios_client(pro_name, current_thread_name_index, connected_ios_device_lis
             wda_port = connected_ios_devices_dict["wda_port"]
             device_name = connected_ios_devices_dict["device_name"]
             break
-    log.info("\n\n")
-    log.info("device_name -> " + device_name)
-    log.info("wda_port -> " + wda_port)
-    log.info("\n\n")
+    # log.info("\n\n")
+    # log.info("device_name -> " + device_name)
+    # log.info("wda_port -> " + wda_port)
+    # log.info("\n\n")
 
     client = None
     try:

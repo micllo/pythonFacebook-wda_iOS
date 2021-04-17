@@ -58,7 +58,11 @@ class ParaCase(unittest.TestCase):
         self.device_info["device_name"] = self.device_name
         self.device_info["device_width"] = self.device_width
         self.device_info["device_height"] = self.device_height
+        self.log.info("\n\n")
         self.log.info("self.device_info -> " + str(self.device_info))
+        self.log.info("device_name -> " + str(self.device_name))
+        self.log.info("test_method -> " + str(self.test_method))
+        self.log.info("\n\n")
 
         # 获取APP应用信息
         from Config.pro_config import get_app_bundleId
