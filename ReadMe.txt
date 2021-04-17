@@ -21,6 +21,7 @@
    使用真机设备时，需要在真机上进行设备授信确认
    （1）菜单栏：Product---> Test
    （2）若使用真机：则打开设置 --> 通用 --> 描述文件与设备管理 --> 开发者App ，设置Apple Development xxxxx 在此iPhone上受信
+        < 注意：在 Test 执行的过程中设置 >
 2.使用真机测试时，通过'iproxy'命令映射端口后，若发现 'http://localhost:8100/status'地址没有响应
   原因：可能是由于真机设置了锁屏功能，端口映射时无法解锁真机导致映射失败
   解决：手动解锁真机的锁屏功能，WDA服务会自动映射端口
@@ -224,16 +225,20 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 【 服 务 端 配 置 Openatx/Facebook-wda 环 境 】
 
 [ 未 解 决 的 问 题 ]
-'Docker'中无法获取通过'USB'连接的真机设备
+1.'Docker'中无法获取通过'USB'连接的真机设备
+2.'Docker'中无法启动在宿主机中通过iproxy映射成功的真机设备
 
 [ 环 境 配 置 方 案 ]
-1.在 mac_mini | centos 上启用一个Docker容器：监控服务
-2.在 mac_mini 主机上安装相应工具和服务，并配置iOS设备的连接
+方案一 在 mac_mini | centos 上启用一个Docker容器(自动化测试服务)：该方案目前只能测试模拟器
+      在 mac_mini 主机上安装相应工具和服务，并配置iOS设备的连接
+（1）使用'xcodebuild'命令将WDA服务安装入模拟器中并启动端口
+（2）获取已连接的iOS设备信息列表：需要通过SSH命令从Docker登录到mac_mini宿主机上，然后使用宿主机上的相关命令
+     < 原因：相关XCold工具都是安装在宿主机上的 >
+
+方案二：在 mac_mini 上安装所有工具和服务（不使用Docker）
 （1）若使用真机，则需要USB连接电脑
 （2）使用'xcodebuild'命令将WDA服务安装入真机或模拟器中并启动端口
 （3）有些真机无法通过IP和端口访问，需要通过'iproxy'命令将设备的端口映射到电脑上
-（4）获取已连接的iOS设备信息列表：需要通过SSH命令从Docker登录到mac_mini宿主机上，然后使用宿主机上的相关命令
-     < 原因：相关XCold工具都是安装在宿主机上的 >
 
 
 ------------------------------------------
