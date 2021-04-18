@@ -8,6 +8,7 @@ SCREENSHOTS_DIR = PRO_PATH + "Screenshots/"
 
 # 服务器地址
 SERVER_IP = "127.0.0.1"
+SERVER_IP_docker = SERVER_IP
 
 # Nginx 端口
 NGINX_PORT = "4010"

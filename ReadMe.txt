@@ -173,7 +173,7 @@ ps -ef | grep -v "grep" | grep iproxy
 ps -ef | grep -v "grep" | grep iproxy | awk '{print $2}' | xargs kill -9
 
 # 查询 映射情况
-http://localhost:8200/status
+http://127.0.0.1:8200/status
 
 
 ########################################################################################################################
@@ -229,17 +229,15 @@ pip3 install -v flask==0.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-
 2.'Docker'中无法启动在宿主机中通过iproxy映射成功的真机设备
 
 [ 环 境 配 置 方 案 ]
-方案一 在 mac_mini | centos 上启用一个Docker容器(自动化测试服务)：该方案目前只能测试模拟器
-      在 mac_mini 主机上安装相应工具和服务，并配置iOS设备的连接
-（1）使用'xcodebuild'命令将WDA服务安装入模拟器中并启动端口
-（2）获取已连接的iOS设备信息列表：需要通过SSH命令从Docker登录到mac_mini宿主机上，然后使用宿主机上的相关命令
-     < 原因：相关XCold工具都是安装在宿主机上的 >
-
-方案二：在 mac_mini 上安装所有工具和服务（不使用Docker）
+1.在 mac_mini | centos 上启用一个Docker容器(自动化测试服务)
+2.在 mac_mini 主机上安装相应工具和服务，并配置iOS设备的连接
 （1）若使用真机，则需要USB连接电脑
-（2）使用'xcodebuild'命令将WDA服务安装入真机或模拟器中并启动端口
-（3）有些真机无法通过IP和端口访问，需要通过'iproxy'命令将设备的端口映射到电脑上
-
+（2）有些真机无法通过IP和端口访问，需要通过'iproxy'命令将设备的端口映射到电脑上
+（3）使用'xcodebuild'命令将WDA服务安装入真机或模拟器中并启动端口
+（4）获取已连接的iOS设备信息列表：需要通过SSH命令从Docker登录到mac_mini宿主机上，然后使用宿主机上的相关命令
+     < 原因：相关XCold工具都是安装在宿主机上的 >
+（5）docker内部连接iphone真机，需要特殊的ip地址 'docker.for.mac.host.internal'
+     使用该地址可以使 docker 访问 宿主机 IP（解决iphone真机通过iproxy映射宿主机后 docker内部无法访问的问题）
 
 ------------------------------------------
 

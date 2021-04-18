@@ -39,8 +39,15 @@ def get_ios_client(pro_name, current_thread_name_index, connected_ios_device_lis
 
     client = None
     try:
+        # 确认 server_ip（ 注：Docker环境连接iphone真机，需要使用特殊的 server_ip ）
+        server_ip = cfg.SERVER_IP
+        if cfg.SERVER_IP != "127.0.0.1" and "真机" in device_name:
+            server_ip = cfg.SERVER_IP_docker
+
+        log.info("\n\n" + device_name + " 设备的 server_ip :" + server_ip + "\n")
+
         # 连接设备(通过WDA服务在设备的的监听端口)
-        client = wda.Client("http://" + cfg.SERVER_IP + ":" + wda_port)
+        client = wda.Client("http://" + server_ip + ":" + wda_port)
 
         # 等待 WDA 服务启动
         client.wait_ready(timeout=gv.WAIT_WDA_READY)

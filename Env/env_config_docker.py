@@ -6,8 +6,10 @@ REPORTS_DIR = "/opt/project/reports/"
 SCREENSHOTS_DIR = "/opt/project/screenshots/"
 
 # 服务器地址
-# SERVER_IP_PORT = "192.168.3.102"  #  MERCURY_1602
-SERVER_IP = "192.168.31.9"  # Demba Ba  192.168.31.10
+SERVER_IP = "192.168.31.9"  # Demba Ba
+
+# docker 访问 宿主机 IP（解决iphone真机通过iproxy映射宿主机后 docker内部无法访问的问题）
+SERVER_IP_docker = "docker.for.mac.host.internal"
 
 # Nginx 端口
 NGINX_PORT = "1080"
