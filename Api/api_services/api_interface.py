@@ -9,7 +9,8 @@ from Common.com_func import is_null
 from Common.test_func import is_exist_start_case, is_exist_online_case, get_connected_ios_devices_info
 from Tools.mongodb import MongoGridFS
 from Env import env_config as cfg
-from Config.pro_config import pro_exist
+from Config.pro_config import pro_name_list
+
 
 """
 api 服务接口
@@ -22,6 +23,8 @@ def show_index():
     result_dict = dict()
     result_dict["nginx_api_proxy"] = cfg.NGINX_API_PROXY
     result_dict["api_addr"] = cfg.API_ADDR
+    result_dict["pro_name_list"] = pro_name_list
+    result_dict["pro_num"] = len(pro_name_list)
     return render_template('index.html', tasks=result_dict)
 
 
@@ -48,7 +51,7 @@ def run_case(pro_name):
     :param pro_name:
     :return:
     """
-    if not pro_exist(pro_name):
+    if pro_name not in pro_name_list:
         msg = PRO_NOT_EXIST
     else:
         # 获取已连接的设备列表
